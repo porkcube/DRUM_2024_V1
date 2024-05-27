@@ -123,8 +123,8 @@ const String tmodeZ[20] = { "Pad", "Sel", "Write", "Mute", "Solo", "Clear","Load
 
 // i2s
 
-#define I2S_BCK_PIN 33
-#define I2S_WS_PIN 37
+#define I2S_BCK_PIN      33
+#define I2S_WS_PIN       37
 #define I2S_DATA_OUT_PIN 35
 
 #define DMA_BUF_LEN     32          
@@ -181,13 +181,17 @@ int master_filter=0;
 int octave=5;
 
 ////////////////////////////// LEDS
-#define LED_PIN    39
+#define LED_PIN   39
 #define LED_COUNT 32
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 // Set more friendly led numbers
 // 0 to 15 as 16 step, 16 sounds,... and 16 to 23 as selected modes
-const byte real_led[32]={ 8, 9,10,11,24,25,26,27,15,14,13,12,31,30,29,28,
-                          0, 1, 2, 3,16,17,18,19, 7, 6, 5, 4,23,22,21,20};
+const byte real_led[32]={
+                          12, 13, 14, 15, 28, 29, 30, 31,
+                          8,   9, 10, 11, 24, 25, 26, 27,
+                          0,   1,  2,  3, 16, 17, 18, 19,
+                          7,   6,  5,  4, 23, 22, 21, 20
+                        };
 int counter_refresh=0;
 const byte limit_counter_refresh=7;
 boolean start_counter_refresh=false;
@@ -276,8 +280,8 @@ char keys[ROWS][COLS] = {
   {'v','b','n'}  
 };
 // need to confirm if this is the right order in the PCB version
-byte rowPins[ROWS] = {14, 13, 10, 8,6,4,2,7}; //connect to the row pinouts of the keypad
-byte colPins[COLS] = {40,38,36}; //connect to the column pinouts of the keypad
+byte rowPins[ROWS] = {14, 13, 10, 8, 6, 4, 2, 7}; //connect to the row pinouts of the keypad
+byte colPins[COLS] = {40, 38, 36}; //connect to the column pinouts of the keypad
 Keypad kpd = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 byte trigger_on[24];
 byte nkey;
@@ -349,7 +353,7 @@ void setRandomPattern(byte f){
   for (byte b = 0; b < 16; b++) {
     byte mybit=random(0,2);
     if (veces) {
-      if (mybit) mybit=random(0,2); // Si es 1 hago otro random para que haya menos unos
+      if (mybit) mybit=random(0,2); // Si es 1 hago otro random para que haya menos unos (If it is 1 I do another random so that there are fewer ones)
     }
     bitWrite(pattern[f],b,mybit);
   } 
@@ -357,7 +361,7 @@ void setRandomPattern(byte f){
 }
 
 void setRandomPitch(byte f){
-  // Tomo como referencia para el rango el valor del pot pitch actual
+  // Tomo como referencia para el rango el valor del pot pitch actual (I take as a reference for the range the value of the current pot pitch)
   uint8_t actual=ROTvalue[selected_sound][3];
   uint8_t limite;
   uint8_t prelimite=24;
@@ -436,7 +440,7 @@ void load_pattern(byte pat){
   String nombreArchivoP = "/PAT" + String(pat);
   File archivoP = SPIFFS.open(nombreArchivoP, FILE_READ);   
   if (!archivoP) {
-    Serial.println("Error al abrir el archivo para leer");
+    Serial.println("Error opening file to read");
     return;
   }
   int fila = 0;
@@ -453,7 +457,7 @@ void load_pattern(byte pat){
   String nombreArchivoM = "/MED" + String(pat);
   File archivoM = SPIFFS.open(nombreArchivoM, FILE_READ);
   if (!archivoM) {
-    Serial.println("Error al abrir el archivo para leer");
+    Serial.println("Error opening file to read");
     return;
   }
   fila = 0;
@@ -502,7 +506,7 @@ void save_pattern(byte pat){
   String nombreArchivoP = "/PAT" + String(pat);
   File archivoP = SPIFFS.open(nombreArchivoP, FILE_WRITE);   
   if (!archivoP) {
-    Serial.println("Error al abrir el archivo para escribir");
+    Serial.println("Error opening file to write");
     return;
   }
   for (int i = 0; i < 16; i++) {
@@ -516,7 +520,7 @@ void save_pattern(byte pat){
   String nombreArchivoM = "/MED" + String(pat);
   File archivoM = SPIFFS.open(nombreArchivoM, FILE_WRITE); 
   if (!archivoM) {
-    Serial.println("Error al abrir el archivo para escribir");
+    Serial.println("Error opening file to write");
     return;
   }
   for (int i = 0; i < 16; i++) {
@@ -530,11 +534,11 @@ void save_pattern(byte pat){
 }
 void save_sound(byte pat){
   
-  // Guardar sound
+  // Guardar sound (Save sound)
   String nombreArchivoS = "/SND" + String(pat);
   File archivoS = SPIFFS.open(nombreArchivoS, FILE_WRITE); 
   if (!archivoS) {
-    Serial.println("Error al abrir el archivo para escribir");
+    Serial.println("Error opening file to write");
     return;
   }
   for (int i = 0; i < 16; i++) {
@@ -554,7 +558,7 @@ void setup() {
   btStop();
   // Serial
   Serial.begin(115200);
-  // MISI USB
+  // MIDI USB
 //  MIDI.begin(MIDI_CHANNEL_OMNI);
 //  MIDI.setHandleNoteOn(handleNoteOn);  
 //  MIDI.setHandleControlChange(handleCC);
@@ -578,7 +582,7 @@ void setup() {
   
   // SPIFFS
   if (!SPIFFS.begin(true)) {
-    Serial.println("Error al montar el sistema de archivos SPIFFS");
+    Serial.println("Error mounting SPIFFS file system");
     return;
   } 
   
